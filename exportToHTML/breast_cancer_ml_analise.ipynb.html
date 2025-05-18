@@ -1,0 +1,208 @@
+<html>
+<head>
+<title>breast_cancer_ml_analise.ipynb</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #c3cee3;}
+.s1 { color: #546e7a; font-style: italic;}
+.s2 { color: #c792ea; font-style: italic;}
+.s3 { color: #89ddff;}
+.s4 { color: #c3e88d;}
+.s5 { color: #f78c6c;}
+.ls0 { height: 1px; border-width: 0; color: #2e3c43; background-color:#2e3c43}
+</style>
+</head>
+<body bgcolor="#263238">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+breast_cancer_ml_analise.ipynb</font>
+</center></td></tr></table>
+<pre><span class="s0">#%% md 
+# Teste de Performance 2 
+## Breast Cancer Wisconsin: Ciclo de Vida de Modelos de Machine Learning 
+ 
+**Autor:** Jorge Nascimento 
+ 
+**Objetivo:** Classificação (maligno/benigno) e regressão (estimativa da área média) utilizando o dataset Breast Cancer Wisconsin. 
+ <hr class="ls0">#%% md 
+## 1. Carregamento e Pré-processamento dos Dados <hr class="ls0">#%% 
+</span><span class="s1"># Imports</span>
+<span class="s2">import </span><span class="s0">numpy </span><span class="s2">as </span><span class="s0">np</span>
+<span class="s2">import </span><span class="s0">pandas </span><span class="s2">as </span><span class="s0">pd</span>
+<span class="s2">import </span><span class="s0">matplotlib</span><span class="s3">.</span><span class="s0">pyplot </span><span class="s2">as </span><span class="s0">plt</span>
+<span class="s2">import </span><span class="s0">seaborn </span><span class="s2">as </span><span class="s0">sns</span>
+<span class="s2">from </span><span class="s0">sklearn</span><span class="s3">.</span><span class="s0">datasets </span><span class="s2">import </span><span class="s0">load_breast_cancer</span>
+<span class="s2">from </span><span class="s0">sklearn</span><span class="s3">.</span><span class="s0">model_selection </span><span class="s2">import </span><span class="s0">train_test_split</span>
+<span class="s2">from </span><span class="s0">sklearn</span><span class="s3">.</span><span class="s0">preprocessing </span><span class="s2">import </span><span class="s0">StandardScaler</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1"># Carregar o dataset</span>
+<span class="s0">data </span><span class="s3">= </span><span class="s0">load_breast_cancer</span><span class="s3">(</span><span class="s0">as_frame</span><span class="s3">=</span><span class="s2">True</span><span class="s3">)</span>
+<span class="s0">df </span><span class="s3">= </span><span class="s0">data</span><span class="s3">.</span><span class="s0">frame</span>
+<span class="s0">df</span><span class="s3">.</span><span class="s0">head</span><span class="s3">()</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1"># Informações básicas e verificação de nulos</span>
+<span class="s0">print</span><span class="s3">(</span><span class="s0">df</span><span class="s3">.</span><span class="s0">info</span><span class="s3">())</span>
+<span class="s0">print</span><span class="s3">(</span><span class="s0">df</span><span class="s3">.</span><span class="s0">describe</span><span class="s3">())</span>
+<span class="s0">print</span><span class="s3">(</span><span class="s0">df</span><span class="s3">.</span><span class="s0">isnull</span><span class="s3">().</span><span class="s0">sum</span><span class="s3">())</span><hr class="ls0"><span class="s0">#%% md 
+## 2. Separando variáveis e normalizando <hr class="ls0">#%% 
+</span><span class="s1"># Separando features e targets</span>
+<span class="s0">X </span><span class="s3">= </span><span class="s0">df</span><span class="s3">.</span><span class="s0">drop</span><span class="s3">([</span><span class="s4">'target'</span><span class="s3">, </span><span class="s4">'mean area'</span><span class="s3">], </span><span class="s0">axis</span><span class="s3">=</span><span class="s5">1</span><span class="s3">)</span>
+<span class="s0">y </span><span class="s3">= </span><span class="s0">df</span><span class="s3">[</span><span class="s4">'target'</span><span class="s3">]  </span><span class="s1"># Classificação</span>
+<span class="s0">y_reg </span><span class="s3">= </span><span class="s0">df</span><span class="s3">[</span><span class="s4">'mean area'</span><span class="s3">]  </span><span class="s1"># Regressão</span>
+
+<span class="s1"># Dividindo treino/teste</span>
+<span class="s0">X_train</span><span class="s3">, </span><span class="s0">X_test</span><span class="s3">, </span><span class="s0">y_train</span><span class="s3">, </span><span class="s0">y_test </span><span class="s3">= </span><span class="s0">train_test_split</span><span class="s3">(</span>
+    <span class="s0">X</span><span class="s3">, </span><span class="s0">y</span><span class="s3">, </span><span class="s0">test_size</span><span class="s3">=</span><span class="s5">0.2</span><span class="s3">, </span><span class="s0">random_state</span><span class="s3">=</span><span class="s5">42</span><span class="s3">, </span><span class="s0">stratify</span><span class="s3">=</span><span class="s0">y</span>
+<span class="s3">)</span>
+<span class="s0">X_train_reg</span><span class="s3">, </span><span class="s0">X_test_reg</span><span class="s3">, </span><span class="s0">y_train_reg</span><span class="s3">, </span><span class="s0">y_test_reg </span><span class="s3">= </span><span class="s0">train_test_split</span><span class="s3">(</span>
+    <span class="s0">X</span><span class="s3">, </span><span class="s0">y_reg</span><span class="s3">, </span><span class="s0">test_size</span><span class="s3">=</span><span class="s5">0.2</span><span class="s3">, </span><span class="s0">random_state</span><span class="s3">=</span><span class="s5">42</span>
+<span class="s3">)</span>
+
+<span class="s1"># Normalizando</span>
+<span class="s0">scaler </span><span class="s3">= </span><span class="s0">StandardScaler</span><span class="s3">()</span>
+<span class="s0">X_train_scaled </span><span class="s3">= </span><span class="s0">scaler</span><span class="s3">.</span><span class="s0">fit_transform</span><span class="s3">(</span><span class="s0">X_train</span><span class="s3">)</span>
+<span class="s0">X_test_scaled </span><span class="s3">= </span><span class="s0">scaler</span><span class="s3">.</span><span class="s0">transform</span><span class="s3">(</span><span class="s0">X_test</span><span class="s3">)</span><hr class="ls0"><span class="s0">#%% md 
+## 3. Classificação - KNN <hr class="ls0">#%% 
+</span><span class="s2">from </span><span class="s0">sklearn</span><span class="s3">.</span><span class="s0">neighbors </span><span class="s2">import </span><span class="s0">KNeighborsClassifier</span>
+<span class="s2">from </span><span class="s0">sklearn</span><span class="s3">.</span><span class="s0">metrics </span><span class="s2">import </span><span class="s0">accuracy_score</span><span class="s3">, </span><span class="s0">confusion_matrix</span><span class="s3">, </span><span class="s0">ConfusionMatrixDisplay</span>
+
+<span class="s0">knn </span><span class="s3">= </span><span class="s0">KNeighborsClassifier</span><span class="s3">(</span><span class="s0">n_neighbors</span><span class="s3">=</span><span class="s5">5</span><span class="s3">)</span>
+<span class="s0">knn</span><span class="s3">.</span><span class="s0">fit</span><span class="s3">(</span><span class="s0">X_train_scaled</span><span class="s3">, </span><span class="s0">y_train</span><span class="s3">)</span>
+<span class="s0">y_pred </span><span class="s3">= </span><span class="s0">knn</span><span class="s3">.</span><span class="s0">predict</span><span class="s3">(</span><span class="s0">X_test_scaled</span><span class="s3">)</span>
+<span class="s0">acc </span><span class="s3">= </span><span class="s0">accuracy_score</span><span class="s3">(</span><span class="s0">y_test</span><span class="s3">, </span><span class="s0">y_pred</span><span class="s3">)</span>
+<span class="s0">print</span><span class="s3">(</span><span class="s4">f'Acurácia do KNN (K=5): </span><span class="s3">{</span><span class="s0">acc</span><span class="s3">:</span><span class="s4">.4f</span><span class="s3">}</span><span class="s4">'</span><span class="s3">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1"># Matriz de Confusão</span>
+<span class="s0">cm </span><span class="s3">= </span><span class="s0">confusion_matrix</span><span class="s3">(</span><span class="s0">y_test</span><span class="s3">, </span><span class="s0">y_pred</span><span class="s3">)</span>
+<span class="s0">disp </span><span class="s3">= </span><span class="s0">ConfusionMatrixDisplay</span><span class="s3">(</span><span class="s0">cm</span><span class="s3">, </span><span class="s0">display_labels</span><span class="s3">=</span><span class="s0">data</span><span class="s3">.</span><span class="s0">target_names</span><span class="s3">)</span>
+<span class="s0">disp</span><span class="s3">.</span><span class="s0">plot</span><span class="s3">(</span><span class="s0">cmap</span><span class="s3">=</span><span class="s4">'Blues'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">title</span><span class="s3">(</span><span class="s4">'Matriz de Confusão'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">show</span><span class="s3">()</span><hr class="ls0"><span class="s0">#%% md 
+## 4. Geração de Dados Sintéticos com Ruído <hr class="ls0">#%% 
+</span><span class="s2">from </span><span class="s0">sklearn</span><span class="s3">.</span><span class="s0">utils </span><span class="s2">import </span><span class="s0">resample</span>
+
+<span class="s1"># Aumentando base de treino</span>
+<span class="s0">X_syn</span><span class="s3">, </span><span class="s0">y_syn </span><span class="s3">= </span><span class="s0">resample</span><span class="s3">(</span><span class="s0">X_train_scaled</span><span class="s3">, </span><span class="s0">y_train</span><span class="s3">, </span><span class="s0">n_samples</span><span class="s3">=</span><span class="s0">len</span><span class="s3">(</span><span class="s0">X_train</span><span class="s3">)*</span><span class="s5">2</span><span class="s3">, </span><span class="s0">random_state</span><span class="s3">=</span><span class="s5">42</span><span class="s3">)</span>
+<span class="s0">noise </span><span class="s3">= </span><span class="s0">np</span><span class="s3">.</span><span class="s0">random</span><span class="s3">.</span><span class="s0">normal</span><span class="s3">(</span><span class="s5">0</span><span class="s3">, </span><span class="s5">0.1</span><span class="s3">, </span><span class="s0">X_syn</span><span class="s3">.</span><span class="s0">shape</span><span class="s3">)</span>
+<span class="s0">X_syn_noisy </span><span class="s3">= </span><span class="s0">X_syn </span><span class="s3">+ </span><span class="s0">noise</span>
+
+<span class="s1"># Re-treinando com base aumentada</span>
+<span class="s0">knn_syn </span><span class="s3">= </span><span class="s0">KNeighborsClassifier</span><span class="s3">(</span><span class="s0">n_neighbors</span><span class="s3">=</span><span class="s5">5</span><span class="s3">)</span>
+<span class="s0">knn_syn</span><span class="s3">.</span><span class="s0">fit</span><span class="s3">(</span><span class="s0">np</span><span class="s3">.</span><span class="s0">vstack</span><span class="s3">([</span><span class="s0">X_train_scaled</span><span class="s3">, </span><span class="s0">X_syn_noisy</span><span class="s3">]), </span><span class="s0">np</span><span class="s3">.</span><span class="s0">hstack</span><span class="s3">([</span><span class="s0">y_train</span><span class="s3">, </span><span class="s0">y_syn</span><span class="s3">]))</span>
+<span class="s0">y_pred_syn </span><span class="s3">= </span><span class="s0">knn_syn</span><span class="s3">.</span><span class="s0">predict</span><span class="s3">(</span><span class="s0">X_test_scaled</span><span class="s3">)</span>
+<span class="s0">acc_syn </span><span class="s3">= </span><span class="s0">accuracy_score</span><span class="s3">(</span><span class="s0">y_test</span><span class="s3">, </span><span class="s0">y_pred_syn</span><span class="s3">)</span>
+<span class="s0">print</span><span class="s3">(</span><span class="s4">f'Acurácia com base sintética: </span><span class="s3">{</span><span class="s0">acc_syn</span><span class="s3">:</span><span class="s4">.4f</span><span class="s3">}</span><span class="s4">'</span><span class="s3">)</span><hr class="ls0"><span class="s0">#%% md 
+## 5. Avaliando diferentes valores de K <hr class="ls0">#%% 
+ks </span><span class="s3">= </span><span class="s0">range</span><span class="s3">(</span><span class="s5">1</span><span class="s3">, </span><span class="s5">21</span><span class="s3">)</span>
+<span class="s0">scores </span><span class="s3">= []</span>
+<span class="s2">for </span><span class="s0">k </span><span class="s2">in </span><span class="s0">ks</span><span class="s3">:</span>
+    <span class="s0">knn_k </span><span class="s3">= </span><span class="s0">KNeighborsClassifier</span><span class="s3">(</span><span class="s0">n_neighbors</span><span class="s3">=</span><span class="s0">k</span><span class="s3">)</span>
+    <span class="s0">knn_k</span><span class="s3">.</span><span class="s0">fit</span><span class="s3">(</span><span class="s0">X_train_scaled</span><span class="s3">, </span><span class="s0">y_train</span><span class="s3">)</span>
+    <span class="s0">y_pred_k </span><span class="s3">= </span><span class="s0">knn_k</span><span class="s3">.</span><span class="s0">predict</span><span class="s3">(</span><span class="s0">X_test_scaled</span><span class="s3">)</span>
+    <span class="s0">scores</span><span class="s3">.</span><span class="s0">append</span><span class="s3">(</span><span class="s0">accuracy_score</span><span class="s3">(</span><span class="s0">y_test</span><span class="s3">, </span><span class="s0">y_pred_k</span><span class="s3">))</span>
+
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">figure</span><span class="s3">(</span><span class="s0">figsize</span><span class="s3">=(</span><span class="s5">8</span><span class="s3">,</span><span class="s5">4</span><span class="s3">))</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">plot</span><span class="s3">(</span><span class="s0">ks</span><span class="s3">, </span><span class="s0">scores</span><span class="s3">, </span><span class="s0">marker</span><span class="s3">=</span><span class="s4">'o'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">xlabel</span><span class="s3">(</span><span class="s4">'Valor de K'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">ylabel</span><span class="s3">(</span><span class="s4">'Acurácia'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">title</span><span class="s3">(</span><span class="s4">'Acurácia x K no KNN'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">show</span><span class="s3">()</span><hr class="ls0"><span class="s0">#%% md 
+&gt; **Discussão:** Comente como a acurácia variou com K. Normalmente, valores muito baixos ou altos de K podem afetar negativamente a performance. <hr class="ls0">#%% md 
+## 6. Classificação vs Regressão 
+ 
+&gt; Classificação prevê categorias (benigno/maligno), regressão prevê valores contínuos (área média do tumor). Agora, partimos para o modelo de regressão. <hr class="ls0">#%% md 
+## 7. Regressão Linear para estimar área média <hr class="ls0">#%% 
+</span><span class="s2">from </span><span class="s0">sklearn</span><span class="s3">.</span><span class="s0">linear_model </span><span class="s2">import </span><span class="s0">LinearRegression</span>
+<span class="s2">from </span><span class="s0">sklearn</span><span class="s3">.</span><span class="s0">metrics </span><span class="s2">import </span><span class="s0">r2_score</span><span class="s3">, </span><span class="s0">mean_squared_error</span>
+
+<span class="s0">reg </span><span class="s3">= </span><span class="s0">LinearRegression</span><span class="s3">()</span>
+<span class="s0">reg</span><span class="s3">.</span><span class="s0">fit</span><span class="s3">(</span><span class="s0">X_train_scaled</span><span class="s3">, </span><span class="s0">y_train_reg</span><span class="s3">)</span>
+<span class="s0">y_pred_reg </span><span class="s3">= </span><span class="s0">reg</span><span class="s3">.</span><span class="s0">predict</span><span class="s3">(</span><span class="s0">X_test_scaled</span><span class="s3">)</span>
+<span class="s0">r2 </span><span class="s3">= </span><span class="s0">r2_score</span><span class="s3">(</span><span class="s0">y_test_reg</span><span class="s3">, </span><span class="s0">y_pred_reg</span><span class="s3">)</span>
+<span class="s0">mse </span><span class="s3">= </span><span class="s0">mean_squared_error</span><span class="s3">(</span><span class="s0">y_test_reg</span><span class="s3">, </span><span class="s0">y_pred_reg</span><span class="s3">)</span>
+<span class="s0">print</span><span class="s3">(</span><span class="s4">f'R²: </span><span class="s3">{</span><span class="s0">r2</span><span class="s3">:</span><span class="s4">.4f</span><span class="s3">} </span><span class="s4">| MSE: </span><span class="s3">{</span><span class="s0">mse</span><span class="s3">:</span><span class="s4">.2f</span><span class="s3">}</span><span class="s4">'</span><span class="s3">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1"># Gráfico de dispersão</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">scatter</span><span class="s3">(</span><span class="s0">y_test_reg</span><span class="s3">, </span><span class="s0">y_pred_reg</span><span class="s3">, </span><span class="s0">alpha</span><span class="s3">=</span><span class="s5">0.7</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">xlabel</span><span class="s3">(</span><span class="s4">'Área real'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">ylabel</span><span class="s3">(</span><span class="s4">'Área predita'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">title</span><span class="s3">(</span><span class="s4">'Área real vs predita'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">plot</span><span class="s3">([</span><span class="s0">y_test_reg</span><span class="s3">.</span><span class="s0">min</span><span class="s3">(), </span><span class="s0">y_test_reg</span><span class="s3">.</span><span class="s0">max</span><span class="s3">()], [</span><span class="s0">y_test_reg</span><span class="s3">.</span><span class="s0">min</span><span class="s3">(), </span><span class="s0">y_test_reg</span><span class="s3">.</span><span class="s0">max</span><span class="s3">()], </span><span class="s4">'r--'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">show</span><span class="s3">()</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1"># Histograma dos resíduos</span>
+<span class="s0">residuos </span><span class="s3">= </span><span class="s0">y_test_reg </span><span class="s3">- </span><span class="s0">y_pred_reg</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">hist</span><span class="s3">(</span><span class="s0">residuos</span><span class="s3">, </span><span class="s0">bins</span><span class="s3">=</span><span class="s5">30</span><span class="s3">, </span><span class="s0">edgecolor</span><span class="s3">=</span><span class="s4">'k'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">xlabel</span><span class="s3">(</span><span class="s4">'Resíduo'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">ylabel</span><span class="s3">(</span><span class="s4">'Frequência'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">title</span><span class="s3">(</span><span class="s4">'Histograma dos Resíduos'</span><span class="s3">)</span>
+<span class="s0">plt</span><span class="s3">.</span><span class="s0">show</span><span class="s3">()</span><hr class="ls0"><span class="s0">#%% md 
+</span>
+<span class="s0">## 8. Análise Crítica 
+ 
+Os modelos desenvolvidos apresentaram resultados robustos para o Breast Cancer Wisconsin, mas sempre existem oportunidades de aprimoramento e expansão. Abaixo, listo pontos de atenção observados durante a execução dos experimentos e sugestões concretas de melhorias, com ideias de algoritmos que podem agregar valor ao pipeline de análise. 
+ 
+--- 
+ 
+### **Resultados dos Modelos** 
+ 
+- **KNN para Classificação:**   
+  A acurácia obtida com o KNN foi elevada, confirmando a adequação desse algoritmo para bases bem comportadas e com bom número de exemplos rotulados. A normalização foi fundamental, já que o KNN depende de distâncias euclidianas. Variações no parâmetro K influenciaram a performance, sendo importante fazer tuning via validação cruzada. 
+- **Regressão Linear:**   
+  O modelo de regressão linear explicou boa parte da variância da área média dos tumores, porém apresentou resíduos com certa dispersão, indicando que parte da relação entre atributos e área pode não ser linear. 
+ 
+--- 
+ 
+### **Pontos de Atenção** 
+ 
+- O KNN, apesar de simples e interpretável, é sensível a ruído e à escala das features. 
+- A regressão linear pode não capturar relações não-lineares entre as variáveis clínicas e a área do tumor. 
+- Dados sintéticos com ruído são úteis, mas podem gerar amostras irreais se o ruído for exagerado. 
+- Sempre analisar os resíduos e a matriz de confusão para identificar padrões de erro. 
+ 
+--- 
+ 
+### **Sugestões de Melhorias e Novos Algoritmos** 
+ 
+#### **1. Validação Cruzada e Tuning de Hiperparâmetros** 
+- Aplicar `GridSearchCV` ou `RandomizedSearchCV` para encontrar os melhores valores de K no KNN, regularização na regressão, ou outros hiperparâmetros em modelos mais avançados. 
+ 
+#### **2. Teste de Outros Algoritmos de Classificação** 
+- **Random Forest:**   
+  Algoritmo de ensemble robusto, lida bem com outliers e permite extrair a importância das variáveis. 
+- **Support Vector Machine (SVM):**   
+  Pode ter performance superior ao KNN, principalmente após tuning do kernel e do parâmetro C. 
+- **Gradient Boosting (ex: XGBoost, LightGBM):**   
+  Muito utilizado em competições de ML, tem alta capacidade preditiva e flexibilidade. 
+- **Logistic Regression:**   
+  Serve como baseline interpretável para classificação binária. 
+ 
+#### **3. Teste de Outros Algoritmos de Regressão** 
+- **Random Forest Regressor:**   
+  Captura relações não-lineares e interações entre variáveis. 
+- **Gradient Boosting Regressor:**   
+  Alta performance para tarefas de regressão com muitos atributos. 
+- **Regressão Polinomial:**   
+  Permite modelar relações mais complexas que não são puramente lineares. 
+- **Regressão Ridge/Lasso:**   
+  Pode reduzir overfitting e ajudar na seleção de variáveis relevantes. 
+ 
+#### **4. Seleção de Features e Redução de Dimensionalidade** 
+- Usar métodos como Recursive Feature Elimination (RFE), PCA (Análise de Componentes Principais) ou feature importance dos modelos de árvore para reduzir o número de variáveis e tornar o modelo mais simples e rápido. 
+ 
+#### **5. Análise de Importância das Variáveis** 
+- Visualizar e interpretar a importância das features para insights clínicos e explicabilidade do modelo. 
+ 
+#### **6. Avaliação Detalhada de Métricas** 
+- Para classificação, além da acurácia, avaliar precisão, recall, F1-score, curva ROC-AUC, principalmente em datasets potencialmente desbalanceados. 
+- Para regressão, analisar o gráfico de resíduos, MAE, RMSE, R² ajustado. 
+ 
+#### **7. Detecção e Tratamento de Outliers** 
+- Investigar possíveis outliers que possam estar distorcendo tanto a classificação quanto a regressão. 
+ 
+--- 
+ 
+### **Resumo** 
+ 
+Os resultados alcançados com KNN e Regressão Linear são positivos, mas podem ser superados com algoritmos de ensemble (Random Forest, Boosting), tuning de hiperparâmetros e técnicas avançadas de seleção de features. Recomenda-se explorar esses caminhos para entregar um modelo mais robusto, interpretável e preciso, sempre avaliando a aplicabilidade clínica e interpretabilidade das soluções propostas. 
+ 
+--- 
+</span></pre>
+</body>
+</html>
